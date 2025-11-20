@@ -1,52 +1,57 @@
-# Welcome to your Expo app 👋
+# TodoList App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicación móvil de gestión de tareas desarrollada con React Native y Expo.
 
+## Características
 
-test branch
-## Get started
+- ✅ Autenticación por correo electrónico
+- ✅ Creación, edición y eliminación de tareas
+- ✅ Clasificación de tareas (Completadas / No Completadas)
+- ✅ Filtrado de tareas por usuario
+- ✅ Interfaz limpia y responsiva
 
-1. Install dependencies
+## Requisitos
 
-   ```bash
-   npm install
-   ```
+- Node.js 16+
+- npm o yarn
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Instalación
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Ejecución
 
-## Learn more
+```bash
+npx expo start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Escanea el código QR con Expo Go o ejecuta en emulador.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Estructura del Proyecto
 
-## Join the community
+```
+eva_2_todolist/
+├── app/                    # Pantallas principales
+├── components/             # Componentes reutilizables
+├── Context/                # Context API para estado global
+├── providers/              # Proveedores de contexto
+├── theme/                  # Estilos y colores
+└── constants/              # Configuraciones
+```
 
-Join our community of developers creating universal apps.
+## Tecnologías
+
+- React Native + Expo
+- TypeScript
+- Context API
+- react-native-safe-area-context
+- Ionicons
+
+## Licencia
+
+MIT
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
