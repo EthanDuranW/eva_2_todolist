@@ -3,10 +3,10 @@ import { useContext, useState } from "react";
 import {
     FlatList,
     Platform,
-    SafeAreaView,
     StyleSheet,
     TouchableOpacity,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "../Context/AuthContext";
@@ -50,7 +50,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       {/* Header con email y logout */}
       <Header userEmail={userEmail || ""} onLogout={logout} />
 
@@ -115,7 +115,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === "ios" ? 60 : 20,
     backgroundColor: colors.background,
   },
 
