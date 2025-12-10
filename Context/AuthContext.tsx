@@ -1,13 +1,25 @@
 import { createContext } from "react";
 
+interface Usuario {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export const AuthContext = createContext<{
-  isLogged: boolean;
-  login: (email: string, pass: string) => boolean;
-  logout: () => void;
+  estaAutenticado: boolean;
+  usuario: Usuario | null;
+  cargando: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  registro: (name: string, email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
   userEmail: string | null;
 }>({
-  isLogged: false,
-  login: () => false,
-  logout: () => {},
+  estaAutenticado: false,
+  usuario: null,
+  cargando: true,
+  login: async () => false,
+  registro: async () => false,
+  logout: async () => {},
   userEmail: null,
 });

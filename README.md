@@ -3,12 +3,14 @@ Aplicación móvil de gestión de tareas desarrollada con **React Native** y **E
 
 El objetivo principal de la app es:
 
-- Gestionar tareas (crear, editar, eliminar, completar).
+- Gestionar tareas (crear, editar, eliminar, completar) **conectadas a un backend**.
+- Autenticación real con **API REST** y persistencia de sesión.
 - Clasificar tareas en completadas y no completadas.
 - Filtrar tareas por usuario autenticado.
 - Utilizar **periféricos del dispositivo móvil**:
 - GPS + mapa para ubicación.
 - Cámara / galería para asociar imágenes a las tareas.
+- **Subir imágenes al servidor** mediante multipart/form-data.
 - Integrar **permisos de usuario** de forma correcta y segura.
 - Demostrar su funcionamiento real mediante un video.
 
@@ -32,18 +34,18 @@ La aplicación fue ejecutada en **dispositivo Android** y/o **emulador**, valida
 
 ## ✨ Funcionalidades principales
 
-- ✅ Autenticación por correo electrónico.
-- ✅ Creación de nuevas tareas.
-- ✅ Edición y eliminación de tareas existentes.
-- ✅ Marcado de tareas como:
-- Completadas
-- No completadas
-- ✅ Filtrado de tareas por usuario autenticado.
-- 📍 Obtención de **ubicación actual** mediante GPS.
-- 🗺️ Visualización de la ubicación en un **mapa integrado**.
-- 📸 Captura de imágenes desde la **cámara**.
-- 🖼️ Selección de imágenes desde la **galería** del dispositivo.
-- 🎨 Interfaz simple, limpia y responsiva, orientada a una buena experiencia de usuario.
+- 🔐 **Autenticación real** con backend mediante JWT.
+- 💾 **Persistencia de sesión** con AsyncStorage.
+- ✅ **Gestión completa de tareas** conectada al backend:
+  - Crear, editar, eliminar y marcar como completadas.
+  - Todas las operaciones se sincronizan con el servidor.
+- 📸 **Captura de imágenes** desde la cámara.
+- 🖼️ **Selección de imágenes** desde la galería del dispositivo.
+- ☁️ **Subida de imágenes al servidor** y visualización desde URL remota.
+- 📍 **Obtención de ubicación actual** mediante GPS.
+- 🗺️ **Visualización de la ubicación** en un mapa integrado.
+- 👤 **Filtrado automático** de tareas por usuario autenticado.
+- 🎨 Interfaz simple, limpia y responsiva, optimizada para Android e iOS.
 
 ---
 
@@ -53,32 +55,37 @@ La estructura del proyecto se organiza de forma modular para separar la lógica 
 
 ```bash
 eva_2_todolist/
-├── app/                    # Pantallas principales (login, lista de tareas, detalle, etc.)
+├── app/                    # Pantallas principales (login, lista de tareas, agregar, editar)
 ├── components/             # Componentes reutilizables (cards, inputs, botones, etc.)
-├── Context/                # Manejo de estado global (usuario, tareas)
-├── providers/              # Proveedores de contexto y configuración general
+├── Context/                # Definiciones de contextos (Auth y Tasks)
+├── providers/              # Implementación de proveedores de contexto
+├── services/               # Servicios de API (auth.ts, tasks.ts, api.ts)
 ├── theme/                  # Estilos, paleta de colores, tipografías
 └── constants/              # Constantes y configuraciones generales
 ```
 
 Esta arquitectura permite:
 
-- Separar la lógica de presentación de la lógica de estado.
+- Separar la lógica de presentación de la lógica de estado y comunicación con API.
 - Reutilizar componentes visuales y de interacción.
+- Centralizar las llamadas al backend en servicios dedicados.
 - Facilitar el mantenimiento y la escalabilidad del código.
 
 ---
 
 ## 🛠️ Tecnologías utilizadas
 
-- ⚛️ React Native + Expo
-- 📘 TypeScript
-- 🔄 Context API (estado global para usuario y tareas)
-- 🔐 react-native-safe-area-context
-- 🎯 @expo/vector-icons (Ionicons u otros íconos compatibles)
-- 🗺️ react-native-maps
-- 📷 expo-image-picker
-- 📍 expo-location
+- ⚛️ **React Native + Expo**
+- 📘 **TypeScript**
+- 🔄 **Context API** (estado global para usuario y tareas)
+- 🌐 **API REST** (autenticación y CRUD de tareas)
+- 💾 **AsyncStorage** (persistencia de token JWT)
+- 🔐 **react-native-safe-area-context**
+- 🎯 **@expo/vector-icons** (Ionicons)
+- 🗺️ **react-native-maps**
+- 📷 **expo-image-picker**
+- 📍 **expo-location**
+- 🖼️ **Subida de imágenes** con FormData
 
 ---
 
@@ -104,6 +111,12 @@ cd eva_2_todolist
 npm install
 ```
 
+3. Configurar variables de entorno:
+```bash
+cp .env.example .env
+```
+Editar el archivo `.env` con la URL del backend si es necesario.
+
 ---
 
 ## ▶️ Ejecución
@@ -116,6 +129,31 @@ npx expo start
 2. Ejecutar la aplicación:
 - Escanear el código QR con la app Expo Go en el dispositivo móvil, o
 - Seleccionar la opción correspondiente en el terminal para abrir en un emulador Android/iOS.
+
+---
+
+## 🔌 Backend API
+
+La aplicación se conecta a un backend REST disponible en:
+```
+https://basic-hono-api.borisbelmarm.workers.dev
+```
+
+Documentación de endpoints: [API Docs](https://basic-hono-api.borisbelmarm.workers.dev/docs)
+
+### Funcionalidades del backend:
+- ✅ Autenticación con JWT (login/registro)
+- ✅ CRUD completo de tareas
+- ✅ Subida de imágenes
+- ✅ Filtrado automático por usuario
+
+### 🔑 Credenciales de Acceso:
+**Contraseña universal:** `password123`
+
+> **Auto-registro inteligente:**
+> - Todos los usuarios usan la contraseña `password123`
+> - Si ingresas un email nuevo, se crea automáticamente una cuenta
+> - No hay formulario de registro separado, todo ocurre en el login
 
 ---
 

@@ -5,31 +5,29 @@ import { AuthProvider } from "../providers/AuthProvider";
 import { TaskProvider } from "../providers/TaskProvider";
 
 function AuthGate({ children }: { children: React.ReactNode }) {
-  const { isLogged } = useContext(AuthContext);
+  const { estaAutenticado, cargando } = useContext(AuthContext);
   const segments = useSegments();
   const router = useRouter();
 
-  // Estado para confirmar que el layout ya montó
-  const [ready, setReady] = useState(false);
+  const [listo, setListo] = useState(false);
 
   useEffect(() => {
-    // Marcamos el layout como listo para navegar
-    setReady(true);
+    setListo(true);
   }, []);
 
   useEffect(() => {
-    if (!ready) return; // 🚨 NO navegar antes de estar listos
+    if (!listo || cargando) return;
 
-    const inAuthGroup = segments[0] === "login";
+    const enGrupoAuth = segments[0] === "login";
 
-    if (!isLogged && !inAuthGroup) {
+    if (!estaAutenticado && !enGrupoAuth) {
       router.replace("/login");
     }
 
-    if (isLogged && inAuthGroup) {
+    if (estaAutenticado && enGrupoAuth) {
       router.replace("/");
     }
-  }, [isLogged, segments, ready, router]);
+  }, [estaAutenticado, segments, listo, cargando, router]);
 
   return <>{children}</>;
 }

@@ -1,4 +1,5 @@
 import {
+    ActivityIndicator,
     Alert,
     Image,
     KeyboardAvoidingView,
@@ -7,7 +8,7 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -21,11 +22,11 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import AnimatedButton from "../components/AnimatedButton";
 import Input from "../components/Input";
 import { TaskContext, TaskContextType } from "../Context/TaskContext";
+import { taskService } from "../services/tasks";
 import { colors } from "../theme/colors";
 
 import type { ViewStyle } from "react-native";
 
-/* boton con estilo dinamico  */
 const getBackBtnStyle = (top: number): ViewStyle => ({
   position: "absolute",
   top: top + 10,
@@ -48,20 +49,20 @@ export default function EditTaskScreen() {
   const [descripcion, setDescripcion] = useState(tarea?.descripcion ?? "");
   const [imagen, setImagen] = useState<string | null>(tarea?.imagen ?? null);
   const [ubicacion, setUbicacion] = useState(tarea?.ubicacion ?? null);
-
-  /* permisos para la aplicacion */
+  const [subiendoImagen, setSubiendoImagen] = useState(false);
+  const [guardando, setGuardando] = useState(false);
 
   const pedirPermisoGaleria = async () => {
     try {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("Permiso requerido", "Debes permitir acceso a la galería.");
+        Alert.alert("Oye poh! 🖼️", "Necesito que me dejes revisar tus fotitos de la galería 📸");
         return false;
       }
       return true;
     } catch {
-      Alert.alert("Error", "No se pudo pedir permiso de galería.");
+      Alert.alert("Chuta! 😅", "Algo pasó y no pude pedir permiso pa' la galería wn");
       return false;
     }
   };
@@ -70,17 +71,15 @@ export default function EditTaskScreen() {
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("Permiso requerido", "Debes permitir acceso a la cámara.");
+        Alert.alert("Yaaa poh! 📷", "Dame permiso pa' usar la cámara po compadre 🤳");
         return false;
       }
       return true;
     } catch {
-      Alert.alert("Error", "No se pudo pedir permiso de cámara.");
+      Alert.alert("Rayos! ⚡", "No pude pedir permiso pa' la cámara, que la cagá");
       return false;
     }
   };
-
-  /* imagen de la galeria y tomar la foto */
 
   const elegirImagen = async () => {
     try {
@@ -89,13 +88,25 @@ export default function EditTaskScreen() {
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: "images",
-        allowsEditing: Platform.OS === "ios",
+        allowsEditing: true,
         quality: 0.8,
       });
 
-      if (!result.canceled) setImagen(result.assets[0].uri);
+      if (!result.canceled) {
+        const uriLocal = result.assets[0].uri;
+        setSubiendoImagen(true);
+        try {
+          const urlRemota = await taskService.subirImagen(uriLocal);
+          setImagen(urlRemota);
+        } catch (error) {
+          Alert.alert("Pucha! 😔", "No pude subir la foto al servidor. Inténtalo de nuevo po");
+          console.error(error);
+        } finally {
+          setSubiendoImagen(false);
+        }
+      }
     } catch {
-      Alert.alert("Error", "No se pudo cargar la imagen.");
+      Alert.alert("Uta! 😬", "No caché qué pasó pero no se pudo cargar la imagen wn");
     }
   };
 
@@ -106,17 +117,27 @@ export default function EditTaskScreen() {
 
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: "images",
-        allowsEditing: Platform.OS === "ios",
+        allowsEditing: true,
         quality: 0.8,
       });
 
-      if (!result.canceled) setImagen(result.assets[0].uri);
+      if (!result.canceled) {
+        const uriLocal = result.assets[0].uri;
+        setSubiendoImagen(true);
+        try {
+          const urlRemota = await taskService.subirImagen(uriLocal);
+          setImagen(urlRemota);
+        } catch (error) {
+          Alert.alert("Pucha! 😔", "No pude subir la foto al servidor. Inténtalo de nuevo po");
+          console.error(error);
+        } finally {
+          setSubiendoImagen(false);
+        }
+      }
     } catch {
-      Alert.alert("Error", "No se pudo abrir la cámara.");
+      Alert.alert("Nooo! 📸", "No pude abrir la cámara cachai. Será el celu?");
     }
   };
-
-  /* ubicacion como mapa*/
 
   const obtenerUbicacion = async () => {
     try {
@@ -124,7 +145,7 @@ export default function EditTaskScreen() {
         await Location.requestForegroundPermissionsAsync();
 
       if (status !== "granted") {
-        Alert.alert("Permiso requerido", "Debes permitir acceso a ubicación.");
+        Alert.alert("Oye! 📍", "Necesito que me dejes saber dónde estái po compa");
         return;
       }
 
@@ -134,20 +155,20 @@ export default function EditTaskScreen() {
         lng: loc.coords.longitude,
       });
     } catch {
-      Alert.alert("Error", "No se pudo obtener la ubicación.");
+      Alert.alert("Chuta! 🗺️", "No pillé tu ubicación. ¿Será que estás en modo avión?");
     }
   };
 
-  /* guardar tarea */
-
-  const guardar = () => {
+  const guardar = async () => {
     try {
       if (!titulo.trim()) {
-        Alert.alert("Error", "El título no puede estar vacío.");
+        Alert.alert("Epa! ✍️", "Ponle un título a la tarea po, no seai flojo");
         return;
       }
 
-      editarTarea(id!, {
+      setGuardando(true);
+
+      await editarTarea(id!, {
         titulo,
         descripcion,
         imagen: imagen ?? undefined,
@@ -155,14 +176,16 @@ export default function EditTaskScreen() {
       });
 
       router.replace("/");
-    } catch {
-      Alert.alert("Error", "No se pudo editar la tarea.");
+    } catch (error) {
+      Alert.alert("Noooo! ✏️", "No se pudo editar la tarea wn. Inténtalo otra vez");
+      console.error(error);
+    } finally {
+      setGuardando(false);
     }
   };
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
-      {/* volver */}
       <TouchableOpacity
         onPress={() => router.replace("/")}
         style={getBackBtnStyle(insets.top)}
@@ -203,6 +226,13 @@ export default function EditTaskScreen() {
               icon="camera-outline"
             />
 
+            {subiendoImagen && (
+              <View style={styles.cargandoImagen}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={styles.textoCargando}>Subiendo imagen...</Text>
+              </View>
+            )}
+
             {imagen && (
               <Image source={{ uri: imagen }} style={styles.imgPreview} />
             )}
@@ -236,20 +266,25 @@ export default function EditTaskScreen() {
               </View>
             )}
 
-            <AnimatedButton
-              label="Guardar cambios"
-              onPress={guardar}
-              color="#3aac69ff"
-              icon="checkmark-done-outline"
-            />
+            {guardando ? (
+              <View style={styles.cargandoImagen}>
+                <ActivityIndicator size="small" color="#3aac69ff" />
+                <Text style={styles.textoCargando}>Guardando...</Text>
+              </View>
+            ) : (
+              <AnimatedButton
+                label="Guardar cambios"
+                onPress={guardar}
+                color="#3aac69ff"
+                icon="checkmark-done-outline"
+              />
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
-/* estilos */
 
 const styles = StyleSheet.create({
   safe: {
@@ -297,5 +332,21 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 150,
     borderRadius: 12,
+  },
+
+  cargandoImagen: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 15,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 12,
+    marginTop: 10,
+  },
+
+  textoCargando: {
+    marginLeft: 10,
+    fontSize: 14,
+    color: colors.text,
   },
 });

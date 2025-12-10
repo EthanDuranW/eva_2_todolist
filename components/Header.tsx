@@ -3,10 +3,14 @@ import { colors } from "../theme/colors";
 
 interface HeaderProps {
   userEmail: string | null;
-  onLogout: () => void;
+  onLogout: () => void | Promise<void>;
 }
 
 export const Header = ({ userEmail, onLogout }: HeaderProps) => {
+  const manejarLogout = async () => {
+    await onLogout();
+  };
+
   return (
     <>
       <Text style={styles.titulo}>Mis Tareas</Text>
@@ -16,8 +20,8 @@ export const Header = ({ userEmail, onLogout }: HeaderProps) => {
           <Text style={styles.emailText}>{userEmail}</Text>
         </View>
 
-        <TouchableOpacity onPress={onLogout} style={styles.logoutBtn}>
-          <Text style={styles.logoutText}>Cerrar sesion</Text>
+        <TouchableOpacity onPress={manejarLogout} style={styles.logoutBtn}>
+          <Text style={styles.logoutText}>Cerrar sesión</Text>
         </TouchableOpacity>
       </View>
     </>
