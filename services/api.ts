@@ -1,4 +1,4 @@
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://basic-hono-api.borisbelmarm.workers.dev';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://todo-list.dobleb.cl';
 
 export const api = {
   baseUrl: API_URL,
@@ -55,8 +55,10 @@ export const api = {
           if (textoRespuesta) mensajeError = textoRespuesta;
         }
         
-        // Manejar errores específicos de Cloudflare
-        if (respuesta.status === 503 && mensajeError.includes('1102')) {
+        // Manejar errores específicos
+        if (respuesta.status === 413) {
+          mensajeError = '📸 La imagen es muy pesada wn. La app ya comprime las fotos, pero intenta con otra más chica';
+        } else if (respuesta.status === 503 && mensajeError.includes('1102')) {
           mensajeError = '🔧 El servidor está caído ahora mismo. Intenta de nuevo en unos minutos po';
         } else if (respuesta.status === 503) {
           mensajeError = '⚠️ Servidor no disponible. Espera un toque y vuelve a intentar';

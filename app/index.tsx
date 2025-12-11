@@ -1,12 +1,13 @@
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Platform,
-    StyleSheet,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -17,9 +18,11 @@ import { Header } from "../components/Header";
 import { TaskCard } from "../components/TaskCard";
 import { AuthContext } from "../Context/AuthContext";
 import { TaskContext, TaskContextType } from "../Context/TaskContext";
-import { colors } from "../theme/colors";
+import { useThemeColors } from "../hooks/use-theme-colors";
 
 export default function HomeScreen() {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
   const router = useRouter();
 
   const { lista, eliminarTarea, editarTarea, cargarTareas, cargando } = useContext<TaskContextType>(TaskContext);
@@ -49,7 +52,7 @@ export default function HomeScreen() {
       try {
         await eliminarTarea(tareaAEliminar);
       } catch (error) {
-        console.error("Error eliminando tarea:", error);
+        Alert.alert("Error", "No se pudo eliminar la tarea");
       }
     }
     setModalVisible(false);
@@ -60,7 +63,7 @@ export default function HomeScreen() {
     try {
       await editarTarea(id, { completed: !estadoActual });
     } catch (error) {
-      console.error("Error actualizando tarea:", error);
+      Alert.alert("Error", "No se pudo actualizar la tarea");
     }
   };
 
@@ -142,31 +145,32 @@ export default function HomeScreen() {
   );
 }
 
-/* estilos */
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    backgroundColor: colors.background,
-  },
+function createStyles(colors: any) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: 20,
+      backgroundColor: colors.background,
+    },
 
-  botonAdd: {
-    position: "absolute",
-    right: 20,
-    bottom: Platform.OS === "android" ? 80 : 20,
-    backgroundColor: colors.primary,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 5,
-    zIndex: 999,
-  },
+    botonAdd: {
+      position: "absolute",
+      right: 20,
+      bottom: Platform.OS === "android" ? 80 : 20,
+      backgroundColor: colors.primary,
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      justifyContent: "center",
+      alignItems: "center",
+      elevation: 5,
+      zIndex: 999,
+    },
 
-  cargandoContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
+    cargandoContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+  });
+}

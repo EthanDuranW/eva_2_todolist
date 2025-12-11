@@ -32,12 +32,19 @@ export const authService = {
     
     console.log('📦 Respuesta de login recibida:', respuesta);
     
-    if (respuesta.token) {
-      await AsyncStorage.setItem(TOKEN_KEY, respuesta.token);
-      console.log('💾 Token guardado en AsyncStorage');
+    // La nueva API envuelve la respuesta en { success: true, data: { token, user } }
+    const datos = respuesta.data || respuesta;
+    const token = datos.token;
+    const user = datos.user;
+    
+    if (token) {
+      await AsyncStorage.setItem(TOKEN_KEY, token);
+      console.log('💾 Token guardado en AsyncStorage:', token.substring(0, 20) + '...');
+    } else {
+      console.error('❌ No se recibió token en la respuesta');
     }
     
-    return respuesta;
+    return { token, user };
   },
 
   async registro(datos: CredencialesRegistro): Promise<RespuestaAuth> {
@@ -52,12 +59,19 @@ export const authService = {
       
       console.log('📦 Respuesta de registro recibida:', respuesta);
       
-      if (respuesta.token) {
-        await AsyncStorage.setItem(TOKEN_KEY, respuesta.token);
-        console.log('💾 Token guardado en AsyncStorage');
+      // La nueva API envuelve la respuesta en { success: true, data: { token, user } }
+      const datos_resp = respuesta.data || respuesta;
+      const token = datos_resp.token;
+      const user = datos_resp.user;
+      
+      if (token) {
+        await AsyncStorage.setItem(TOKEN_KEY, token);
+        console.log('💾 Token guardado en AsyncStorage:', token.substring(0, 20) + '...');
+      } else {
+        console.error('❌ No se recibió token en la respuesta');
       }
       
-      return respuesta;
+      return { token, user };
     } catch (error: any) {
       console.error('❌ Error en servicio de registro:', error.message);
       throw error;

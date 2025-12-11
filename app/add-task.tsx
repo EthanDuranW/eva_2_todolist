@@ -23,8 +23,9 @@ import AnimatedButton from "../components/AnimatedButton";
 import Input from "../components/Input";
 import { AuthContext } from "../Context/AuthContext";
 import { TaskContext } from "../Context/TaskContext";
+import { useThemeColors } from "../hooks/use-theme-colors";
 import { taskService } from "../services/tasks";
-import { colors } from "../theme/colors";
+import { resizeImage } from "../utils/imageHelper";
 
 import type { ViewStyle } from "react-native";
 
@@ -39,6 +40,8 @@ const getBackBtnStyle = (top: number): ViewStyle => ({
 });
 
 export default function AddTaskScreen() {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { userEmail } = useContext(AuthContext);
@@ -89,24 +92,24 @@ export default function AddTaskScreen() {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: "images",
         allowsEditing: true,
-        quality: 0.8,
+        quality: 0.2,
       });
 
       if (!result.canceled) {
         const uriLocal = result.assets[0].uri;
         setSubiendoImagen(true);
         try {
-          const urlRemota = await taskService.subirImagen(uriLocal);
+          const uriRedimensionada = await resizeImage(uriLocal);
+          const urlRemota = await taskService.subirImagen(uriRedimensionada);
           setImagen(urlRemota);
         } catch (error) {
           Alert.alert("Pucha! 😔", "No pude subir la foto al servidor. Inténtalo de nuevo po");
-          console.error(error);
         } finally {
           setSubiendoImagen(false);
         }
       }
     } catch {
-      Alert.alert("Nooo! 📸", "No pude abrir la cámara cachai. Será el celu?");
+      Alert.alert("Nooo! 🖋c️", "No pude abrir la galería perrito. Prueba de nuevo");
     }
   };
 
@@ -118,18 +121,18 @@ export default function AddTaskScreen() {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: "images",
         allowsEditing: true,
-        quality: 0.8,
+        quality: 0.3,
       });
 
       if (!result.canceled) {
         const uriLocal = result.assets[0].uri;
         setSubiendoImagen(true);
         try {
-          const urlRemota = await taskService.subirImagen(uriLocal);
+          const uriRedimensionada = await resizeImage(uriLocal);
+          const urlRemota = await taskService.subirImagen(uriRedimensionada);
           setImagen(urlRemota);
         } catch (error) {
           Alert.alert("Pucha! 😔", "No pude subir la foto al servidor. Inténtalo de nuevo po");
-          console.error(error);
         } finally {
           setSubiendoImagen(false);
         }
@@ -179,7 +182,6 @@ export default function AddTaskScreen() {
       router.replace("/");
     } catch (error) {
       Alert.alert("Noooo! 💾", "No se pudo guardar la tarea wn. Dale otra oportunidad");
-      console.error(error);
     } finally {
       setGuardando(false);
     }
@@ -235,7 +237,13 @@ export default function AddTaskScreen() {
             )}
 
             {imagen && (
-              <Image source={{ uri: imagen }} style={styles.imgPreview} />
+              <>
+                <Text style={styles.textoCargando}>Preview de la imagen:</Text>
+                <Image 
+                  source={{ uri: imagen }} 
+                  style={styles.imgPreview}
+                />
+              </>
             )}
 
             <AnimatedButton
@@ -287,67 +295,71 @@ export default function AddTaskScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+function createStyles(colors: any) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  container: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    paddingTop: 60,
-  },
+    container: {
+      paddingHorizontal: 20,
+      paddingBottom: 40,
+      paddingTop: 60,
+    },
 
-  titulo: {
-    fontSize: 30,
-    fontWeight: "800",
-    color: colors.text,
-    textAlign: "center",
-    marginBottom: 20,
-  },
+    titulo: {
+      fontSize: 30,
+      fontWeight: "800",
+      color: colors.text,
+      textAlign: "center",
+      marginBottom: 20,
+    },
 
-  card: {
-    backgroundColor: "#FFF",
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
-  },
+    card: {
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      padding: 20,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.08,
+      shadowRadius: 8,
+      elevation: 4,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  imgPreview: {
-    width: "100%",
-    height: 200,
-    borderRadius: 12,
-    marginTop: 10,
-  },
+    imgPreview: {
+      width: "100%",
+      height: 200,
+      borderRadius: 12,
+      marginTop: 10,
+    },
 
-  mapContainer: {
-    width: "100%",
-    marginTop: 15,
-  },
+    mapContainer: {
+      width: "100%",
+      marginTop: 15,
+    },
 
-  mapaMini: {
-    width: "100%",
-    height: 150,
-    borderRadius: 12,
-  },
+    mapaMini: {
+      width: "100%",
+      height: 150,
+      borderRadius: 12,
+    },
 
-  cargandoImagen: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 15,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 12,
-    marginTop: 10,
-  },
+    cargandoImagen: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 15,
+      backgroundColor: colors.inputBackground,
+      borderRadius: 12,
+      marginTop: 10,
+    },
 
-  textoCargando: {
-    marginLeft: 10,
-    fontSize: 14,
-    color: colors.text,
-  },
-});
+    textoCargando: {
+      marginLeft: 10,
+      fontSize: 14,
+      color: colors.text,
+    },
+  });
+}

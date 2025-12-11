@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { colors } from "../theme/colors";
+import { useThemeColors } from "../hooks/use-theme-colors";
 
 interface HeaderProps {
   userEmail: string | null;
@@ -7,6 +7,9 @@ interface HeaderProps {
 }
 
 export const Header = ({ userEmail, onLogout }: HeaderProps) => {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
+  
   const manejarLogout = async () => {
     await onLogout();
   };
@@ -28,43 +31,47 @@ export const Header = ({ userEmail, onLogout }: HeaderProps) => {
   );
 };
 
-const styles = StyleSheet.create({
-  titulo: {
-    fontSize: 32,
-    fontWeight: "800",
-    textAlign: "center",
-    marginBottom: 10,
-    color: colors.text,
-  },
+function createStyles(colors: any) {
+  return StyleSheet.create({
+    titulo: {
+      fontSize: 32,
+      fontWeight: "800",
+      textAlign: "center",
+      marginBottom: 10,
+      color: colors.text,
+    },
 
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-  },
+    headerRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 15,
+    },
 
-  emailContainer: {
-    backgroundColor: colors.card,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
+    emailContainer: {
+      backgroundColor: colors.card,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  emailText: {
-    fontSize: 12,
-    color: "#666",
-    fontWeight: "500",
-  },
+    emailText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontWeight: "500",
+    },
 
-  logoutBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
+    logoutBtn: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+    },
 
-  logoutText: {
-    color: colors.danger,
-    fontWeight: "700",
-    fontSize: 14,
-  },
-});
+    logoutText: {
+      color: colors.danger,
+      fontWeight: "700",
+      fontSize: 14,
+    },
+  });
+}

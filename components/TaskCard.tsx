@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { Tarea } from "../Context/TaskContext";
-import { colors } from "../theme/colors";
+import { useThemeColors } from "../hooks/use-theme-colors";
 
 interface TaskCardProps {
   item: Tarea;
@@ -13,6 +13,9 @@ interface TaskCardProps {
 }
 
 export const TaskCard = ({ item, index, onChangeStatus, onDelete, onEdit }: TaskCardProps) => {
+  const colors = useThemeColors();
+  const styles = createStyles(colors);
+  
   return (
     <Animated.View
       entering={FadeInUp.delay(index * 50)}
@@ -48,7 +51,7 @@ export const TaskCard = ({ item, index, onChangeStatus, onDelete, onEdit }: Task
         <TouchableOpacity
           onPress={() => onEdit(item.id)}
         >
-          <Ionicons name="create-outline" size={24} color="orange" />
+          <Ionicons name="create-outline" size={24} color={colors.warning} />
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => onDelete(item.id)}>
@@ -59,64 +62,68 @@ export const TaskCard = ({ item, index, onChangeStatus, onDelete, onEdit }: Task
   );
 };
 
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: colors.card,
-    padding: 18,
-    borderRadius: 14,
-    marginVertical: 6,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 5,
-    elevation: 4,
-  },
+function createStyles(colors: any) {
+  return StyleSheet.create({
+    card: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      backgroundColor: colors.card,
+      padding: 18,
+      borderRadius: 14,
+      marginVertical: 6,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.08,
+      shadowRadius: 5,
+      elevation: 4,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  cardContent: {
-    flex: 1,
-    paddingRight: 10,
-  },
+    cardContent: {
+      flex: 1,
+      paddingRight: 10,
+    },
 
-  itemTitulo: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: colors.text,
-    marginBottom: 4,
-  },
+    itemTitulo: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: colors.text,
+      marginBottom: 4,
+    },
 
-  itemDescripcion: {
-    fontSize: 15,
-    color: "#444",
-    marginBottom: 10,
-  },
+    itemDescripcion: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      marginBottom: 10,
+    },
 
-  thumb: {
-    width: "100%",
-    height: 100,
-    borderRadius: 12,
-    marginBottom: 10,
-  },
+    thumb: {
+      width: "100%",
+      height: 100,
+      borderRadius: 12,
+      marginBottom: 10,
+    },
 
-  iconRow: {
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    gap: 10,
-  },
+    iconRow: {
+      justifyContent: "space-evenly",
+      alignItems: "center",
+      gap: 10,
+    },
 
-  statusButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    statusButton: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      justifyContent: "center",
+      alignItems: "center",
+    },
 
-  statusButtonPending: {
-    backgroundColor: "#FFA500",
-  },
+    statusButtonPending: {
+      backgroundColor: "#FFA500",
+    },
 
-  statusButtonCompleted: {
-    backgroundColor: "#4CAF50",
-  },
-});
+    statusButtonCompleted: {
+      backgroundColor: "#4CAF50",
+    },
+  });
+}
